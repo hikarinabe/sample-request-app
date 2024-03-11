@@ -21,13 +21,35 @@ const Page: React.FC = () => {
     }));
   }
 
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
+    setApi((prevApi) => ({
+      ...prevApi!,
+      [event.target.name]: event.target.value,
+    }));
+  }
+
   const handleSubmit = async (event: React.FormEvent): Promise<void> => {
     const endpoint_url = api?.endpointURL !== undefined ? api?.endpointURL : 'http://127.0.0.1:8001/';
     console.log(endpoint_url, api?.request_option, api?.text_json)
 
     event.preventDefault();
+
+    let requestOptions;
+    if (api?.request_option == "POST" || api?.request_option == "DELETE") {
+      requestOptions ={
+        method: api?.request_option,
+        headers:{'Content-Type': 'application/json'},
+        body: JSON.stringify(api?.text_json),
+      };
+    } else {
+      requestOptions ={
+        method: api?.request_option,
+      };
+    }
+    
+    console.log(requestOptions)
     try {
-      const res = await fetch(endpoint_url, { mode: 'cors' });
+      const res = await fetch(endpoint_url, requestOptions);
       const data = await res.text();
       console.log(data);
     } catch (err) {
@@ -47,8 +69,13 @@ const Page: React.FC = () => {
           <input type="textarea" name="text_json" value={api?.text_json || ''} onChange={handleChange} />
         </label><br></br>
         <label>
-          request_option (POST, GET, PUT, DELETE):
-          <input type="text" name="request_option" value={api?.request_option || ''} onChange={handleChange} />
+        request_option (POST, GET, PUT, DELETE):
+          <select value={api?.request_option || ''} onChange={handleSelectChange}>
+            <option value="POST">POST</option>
+            <option value="GET">GET</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+          </select>
         </label><br></br>
         <input type="submit" value="Submit" />
       </form>
