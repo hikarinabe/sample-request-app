@@ -21,7 +21,8 @@ const Page: React.FC = () => {
                 </ul>
             </div>
             <div>
-                This page is page2
+                This page is page2 
+                Add message for test
             </div>
         </main>
     )
